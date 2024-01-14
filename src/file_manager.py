@@ -16,7 +16,7 @@ def convert_file(file_path, mode="encode"):
     :return: The file path of the converted file.
     """
     if VERBOSE:
-            print(colored(f"\n[+] Converting {file_path if mode == 'encode' else file_path} to {'video' if mode == 'encode' else 'original file'}...", "light_cyan"))
+            print(colored(f"[+] Converting {file_path if mode == 'encode' else file_path} to {'video' if mode == 'encode' else 'original file'}...", "light_cyan"))
     video_path = generate_temp_file_path() 
 
 

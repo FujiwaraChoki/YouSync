@@ -1,0 +1,10 @@
+venv
+test_not
+.idea
+config.json
+cpp
+tmp/*
+*.log
+*.db
+.vscode
+__pycache__

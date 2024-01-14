@@ -228,7 +228,7 @@ def list_files():
             table.add_row([index, file[0], colored(file[1], "light_magenta"), file[2]])
         else:
             raise Exception("Invalid database provider.")
-
+    print()
     print(table)
 
 

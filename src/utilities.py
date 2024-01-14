@@ -24,7 +24,7 @@ def print_help():
     print("  -ra, --remove-all\t\tRemove all files from Storage")
     print("  -r, --remove\t\t\tRemove a file from Storage")
     print("  -s, --search\t\t\tSearch for a file")
-    print("  -mv, --move\t\t\tRename a file")
+    print("  -mv, --move\t\t\tRename a file\n")
     print("Report bugs to: www.github.com/FujiwaraChoki/yousync/issues")
 
 def file_exists(file_path):

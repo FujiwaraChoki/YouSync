@@ -291,28 +291,61 @@ def rename_file(file_path, new_file_path):
         conn.close()
     else:
         raise Exception("Invalid database provider.")
-    
+
+
 def search_files(query):
     """
     Search for files in the database.
 
-    :param query: The search query.
+    :param query: The search query (can be a file path or file ID).
 
     :return: None
     """
-    if DB_PROVIDER == "mongodb":
-        files_collection = connect_mongodb()
-        result = files_collection.find({"file_path": {"$regex": query}})
-    elif DB_PROVIDER == "sqlite":
-        conn, cursor = connect_sqlite()
-        cursor.execute("SELECT * FROM files WHERE file_path LIKE ?", ("%" + query + "%",))
+    file_id = None
 
-        result = cursor.fetchall()
+    try:
+        # Try to convert query to UUID
+        file_id = str(uuid.UUID(query))
+    except ValueError:
+        # Query is not a valid UUID, continue with regular search
+        pass
 
-        conn.commit()
-        conn.close()
+    if file_id:
+        # Search by file ID
+        if DB_PROVIDER == "mongodb":
+            files_collection = connect_mongodb()
+            result = files_collection.find_one({"id": file_id})
+            if not result:
+                print(colored("[!] No file found with ID: {}".format(file_id), "yellow"))
+                sys.exit(0)
+            else:
+                result = [result]
+        elif DB_PROVIDER == "sqlite":
+            conn, cursor = connect_sqlite()
+            cursor.execute("SELECT * FROM files WHERE id=?", (file_id,))
+            result = cursor.fetchall()
+            conn.commit()
+            conn.close()
+        else:
+            raise Exception("Invalid database provider.")
     else:
-        raise Exception("Invalid database provider.")
+        # Search by regular query
+        if DB_PROVIDER == "mongodb":
+            files_collection = connect_mongodb()
+            result = files_collection.find({"file_path": {"$regex": query}})
+            if not result:
+                print(colored("[!] No files found", "yellow"))
+                sys.exit(0)
+            else:
+                result = list(result)
+        elif DB_PROVIDER == "sqlite":
+            conn, cursor = connect_sqlite()
+            cursor.execute("SELECT * FROM files WHERE file_path LIKE ?", ("%" + query + "%",))
+            result = cursor.fetchall()
+            conn.commit()
+            conn.close()
+        else:
+            raise Exception("Invalid database provider.")
 
     table = PrettyTable()
 
@@ -327,4 +360,5 @@ def search_files(query):
         else:
             raise Exception("Invalid database provider.")
 
+    print()
     print(table)

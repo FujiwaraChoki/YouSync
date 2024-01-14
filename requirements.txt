@@ -1,5 +1,11 @@
-google-api-python-client
 selenium_firefox==0.2.7
 selenium==4.9.0
-youtube-uploader-selenium
-git+https://github.com/isurushanaka/pafy.git
+pyzbar
+pytube
+termcolor
+selenium
+moviepy
+prettytable
+pymongo
+tqdm
+opencv-python

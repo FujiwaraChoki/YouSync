@@ -7,6 +7,7 @@ from config import *
 from datetime import datetime
 from termcolor import colored
 from pymongo import MongoClient
+from utilities import parse_date
 from prettytable import PrettyTable
 
 # Define Variables
@@ -218,14 +219,16 @@ def list_files():
 
     table = PrettyTable()
 
-    table.field_names = ["📌 Index", "🔑 Hash", "📁 File Path", "🎬 YouTube URL"]
+    table.field_names = ["📌 Index", "🔑 Hash", "📁 File Path", "🎬 YouTube URL", "📅 Created At"]
 
     for file in result:
         index = result.index(file) + 1
         if DB_PROVIDER == "mongodb":
-            table.add_row([index, file["id"], colored(file["file_path"], "light_magenta"), file["video_path"]])
+            table.add_row([index, colored(file["id"], "light_cyan"), colored(file["file_path"], "light_magenta"), \
+                            colored(file["video_path"], "light_yellow"), parse_date(file["created_at"])])
         elif DB_PROVIDER == "sqlite":
-            table.add_row([index, file[0], colored(file[1], "light_magenta"), file[2]])
+            table.add_row([index, colored(file[0], "light_cyan"), colored(file[1], "light_magenta"), \
+                            colored(file[2], "light_yellow"), parse_date(file[3])])
         else:
             raise Exception("Invalid database provider.")
     print()

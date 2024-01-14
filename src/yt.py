@@ -183,13 +183,16 @@ def upload_video(src, hash_id, original_file_name):
         # Get latest video
         if VERBOSE:
             print(colored("\t=> Getting video URL...", "yellow"))
+
         driver.get("https://studio.youtube.com/channel/UC1ghEiTed2YQhLY1YNouzfQ/videos/")
         time.sleep(2)
         videos = driver.find_elements(By.TAG_NAME, "ytcp-video-row")
         first_video = videos[0]
         anchor_tag = first_video.find_element(By.TAG_NAME, "a")
         href = anchor_tag.get_attribute("href")
-        video_id = href.split("/")[4]
+        if VERBOSE:
+            print(colored(f"\t=> Extracting video ID from URL: {href}", "yellow"))
+        video_id = href.split("/")[-2]
 
         # Build URL
         url = build_url(video_id)

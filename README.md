@@ -15,11 +15,46 @@ A Unlimited Storage Cloud Solution, for free, built using Selenium and Python.
 - [Python](https://www.python.org/)
 - [Selenium](https://www.selenium.dev/)
 
+## Installation
+
+YouSync requires [Python](https://www.python.org/) to run.
+
+First, you need to clone the repository and `cd` into it.
+
+```bash
+git clone https://github.com/FujiwaraChoki/yousync.git
+cd yousync
+```
+
+Next, install the `pip` dependencies from the `requirements.txt` file.
+
+```bash
+pip install -r requirements.txt
+```
+
+Then, create a `config.json` file. See [Config Section](#config) for more information.
+
+```bash
+touch config.json
+```
+
+You can now rename `run.sh` to yousync, and add it to your `PATH`.
+
+```bash
+mv run.sh yousync
+export PATH=$PATH:$(pwd)
+```
+
+or on Windows:
+
+```cmd
+ren run.bat yousync
+set PATH=%PATH%;%cd%
+```
+
 ## Run
 
 > ⚠️ **Have your config.json ready before trying to run the script. See [Config Section](#config) for more information.**
-
-YouSync requires [Python](https://www.python.org/) to run.
 
 Install the dependencies and run the script.
 

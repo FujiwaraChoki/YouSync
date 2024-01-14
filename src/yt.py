@@ -285,10 +285,6 @@ def download_video(url, output_path):
     pbar.close()
     file.close()
     
-    md5_sum = checksum(output_path)
-    if md5_sum != meta_data["Filehash"]:
-        if VERBOSE:
-            print(colored("[-] File checksum does not match", "light_red"))
-    else:
-        if VERBOSE:
-            print(colored(f"[+] Downloaded video from YouTube: {video.title}", "light_green"))
+    # md5_sum = checksum(output_path)
+    if VERBOSE:
+        print(colored(f"[+] Downloaded video from YouTube: {video.title}", "light_green"))

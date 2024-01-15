@@ -40,7 +40,7 @@ def print_info(version):
     """
     print("\033[1;31mYouSync\033[0m  -  Unlimited File Storage with YouTube")
     print("\033[1;31mVersion\033[0m  -  " + version)
-    print("\033[1;31mAuthor\033[0m   -  github.com/FujiwaraChoki")
+    print("\033[1;31mAuthor\033[0m   -  https://github.com/FujiwaraChoki")
     print("\033[1;31mLicense\033[0m  -  MIT")
 
 
@@ -61,7 +61,7 @@ def print_help():
     print("  -r, --remove\t\t\tRemove a file from Storage")
     print("  -s, --search\t\t\tSearch for a file")
     print("  -mv, --move\t\t\tRename a file\n")
-    print("Report bugs to: www.github.com/FujiwaraChoki/yousync/issues")
+    print("Report bugs to: https://github.com/FujiwaraChoki/yousync/issues")
 
 
 def file_exists(file_path):

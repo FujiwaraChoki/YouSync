@@ -6,6 +6,7 @@ from db import *
 from utilities import *
 from file_manager import convert_file
 
+
 def upload_file(file_path):
     # Create UUID
     hash_id = str(uuid.uuid4())
@@ -23,9 +24,12 @@ def upload_file(file_path):
     print(colored(f"\n[+] Saving file to database...", "light_cyan"))
     absolute_file_path = os.path.abspath(file_path)
     upload_file_connection(absolute_file_path, video_url, hash_id=hash_id)
-    print(colored(f"[+] Saved file to database successfully: {file_path}", "light_green"))
+    print(
+        colored(f"[+] Saved file to database successfully: {file_path}", "light_green")
+    )
 
     return True
+
 
 def download_file(file_path):
     # Get the video path for the file path
@@ -33,7 +37,11 @@ def download_file(file_path):
 
     if not result:
         if VERBOSE:
-            print(colored("[!] Getting video for file failed. Trying by hash...", "blue"))
+            print(
+                colored(
+                    "[!] Getting video for file failed. Trying by hash...\n", "blue"
+                )
+            )
         result = get_video_for_file_by_hash(file_path)
 
     temp_path = generate_temp_file_path() + ".mp4"
@@ -43,13 +51,14 @@ def download_file(file_path):
 
     return True
 
+
 def remove_file(file_path):
     # Get the video path for the file path
     result = get_video_for_file(file_path)
 
     if not result:
         return False
-    
+
     # Remove the video
     os.remove(result)
 

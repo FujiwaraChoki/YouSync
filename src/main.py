@@ -4,7 +4,8 @@ from db import *
 from files import *
 from utilities import *
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"
+
 
 def main():
     # Print ASCII art
@@ -12,6 +13,9 @@ def main():
 
     # Print info
     print_info(VERSION)
+
+    # Prepare output/working directories
+    prepare_directories()
 
     # Initialize the database
     init_db()
@@ -41,7 +45,9 @@ def main():
 
                 if file_exists(path):
                     if upload_file(path):
-                        print("\033[1;32m\n[+] File upload successful:", path, "\033[0m")
+                        print(
+                            "\033[1;32m\n[+] File upload successful:", path, "\033[0m"
+                        )
                     else:
                         print("\033[1;33m\n\nFile upload failed:", path, "\033[0m")
                 else:
@@ -70,7 +76,9 @@ def main():
 
                 if file_exists(path):
                     if remove_file(path):
-                        print("\033[1;32m\n[+] File remove successful:", path, "\033[0m")
+                        print(
+                            "\033[1;32m\n[+] File remove successful:", path, "\033[0m"
+                        )
                     else:
                         print("\033[1;33m\nFile remove failed:", path, "\033[0m")
                 else:
@@ -80,16 +88,28 @@ def main():
                 print("\nMissing argument after", sys.argv[i])
                 sys.exit(1)
             i += 2
-        elif sys.argv[i].startswith(("-mv", "--move-file")): # Also means rename
+        elif sys.argv[i].startswith(("-mv", "--move-file")):  # Also means rename
             if i + 2 < argc:
                 path = sys.argv[-2]
                 new_path = sys.argv[-1]
 
                 if file_exists(path):
                     if rename_file(path, new_path):
-                        print("\033[1;32m\n[+] File rename successful:", path, "->", new_path, "\033[0m")
+                        print(
+                            "\033[1;32m\n[+] File rename successful:",
+                            path,
+                            "->",
+                            new_path,
+                            "\033[0m",
+                        )
                     else:
-                        print("\033[1;33m\n\nFile rename failed:", path, "->", new_path, "\033[0m")
+                        print(
+                            "\033[1;33m\n\nFile rename failed:",
+                            path,
+                            "->",
+                            new_path,
+                            "\033[0m",
+                        )
                 else:
                     print("\n\nFile does not exist:", path)
                     sys.exit(1)
@@ -97,7 +117,7 @@ def main():
                 print("\n\nMissing argument after", sys.argv[i])
                 sys.exit(1)
             i += 3
-            
+
         elif sys.argv[i].startswith(("-ra", "--remove-all")):
             if remove_all_files():
                 print("\033[1;32m\n[+] All files removed successfully\033[0m")
@@ -111,6 +131,7 @@ def main():
             print("\n\nInvalid argument:", sys.argv[i])
             print("Try 'yousync --help' for more information.")
             sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

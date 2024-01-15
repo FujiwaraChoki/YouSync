@@ -3,6 +3,23 @@ import uuid
 
 from datetime import datetime
 from termcolor import colored
+from config import get_verbose
+
+VERBOSE = get_verbose()
+
+
+def prepare_directories():
+    """
+    Prepare the local directories for temporary files & more.
+
+    :return: None
+    """
+    if not os.path.exists("tmp"):
+        if VERBOSE:
+            print(colored("[+] Creating tmp directory...", "light_cyan"))
+        os.mkdir("tmp")
+        if VERBOSE:
+            print(colored("[+] Created tmp directory successfully.\n", "light_green"))
 
 
 def print_ascii_art():

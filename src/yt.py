@@ -160,7 +160,8 @@ def upload_video(src, hash_id, original_file_name):
         next_button.click()
 
         # Click next again
-        print(colored("\t=> Clicking next again...", "yellow"))
+        if VERBOSE:
+            print(colored("\t=> Clicking next again...", "yellow"))
         next_button = driver.find_element(By.ID, NEXT_BUTTON_ID)
         next_button.click()
 

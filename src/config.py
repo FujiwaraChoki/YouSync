@@ -71,3 +71,12 @@ def get_use_oauth():
     :return: The use OAuth option.
     """
     return json.loads(open("config.json", "r").read())["use_oauth"]
+
+
+def get_channel_id():
+    """
+    Get the channel ID.
+
+    :return: The channel ID.
+    """
+    return json.loads(open("config.json", "r").read())["channel_id"]

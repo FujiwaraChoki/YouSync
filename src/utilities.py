@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 from termcolor import colored
 
+
 def print_ascii_art():
     """
     Print the ASCII art.
@@ -11,7 +12,8 @@ def print_ascii_art():
     :return: None
     """
     with open("assets/ascii_art.txt", "r") as ascii_art_file:
-        print(colored(ascii_art_file.read(), 'red'))
+        print(colored(ascii_art_file.read(), "red"))
+
 
 def print_info(version):
     """
@@ -23,6 +25,7 @@ def print_info(version):
     print("\033[1;31mVersion\033[0m  -  " + version)
     print("\033[1;31mAuthor\033[0m   -  github.com/FujiwaraChoki")
     print("\033[1;31mLicense\033[0m  -  MIT")
+
 
 def print_help():
     """
@@ -43,6 +46,7 @@ def print_help():
     print("  -mv, --move\t\t\tRename a file\n")
     print("Report bugs to: www.github.com/FujiwaraChoki/yousync/issues")
 
+
 def file_exists(file_path):
     """
     Check if a file exists.
@@ -53,13 +57,18 @@ def file_exists(file_path):
     """
     return os.path.exists(file_path)
 
+
 def generate_temp_file_path():
     """
     Generate a temporary file path.
 
     :return: The temporary file path.
     """
-    return "tmp/" + str(uuid.uuid4())
+    if os.name == "nt":
+        return "tmp\\" + str(uuid.uuid4())
+    else:
+        return "tmp/" + str(uuid.uuid4())
+
 
 def parse_date(date):
     """

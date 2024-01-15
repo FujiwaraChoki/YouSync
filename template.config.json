@@ -5,5 +5,6 @@
     "mongodb_uri": "",
     "firefox_profile_location": "",
     "headless": false,
-    "verbose": false
+    "verbose": false,
+    "use_oauth": true
 }

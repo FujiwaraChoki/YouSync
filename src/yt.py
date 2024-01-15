@@ -18,6 +18,8 @@ from moviepy.editor import VideoFileClip, ImageClip, CompositeVideoClip
 FIREFOX_PROFILE_LOCATION = get_firefox_profile_location()
 HEADLESS = get_headless()
 VERBOSE = get_verbose()
+USE_OAUTH = get_use_oauth()
+
 
 def build_url(video_id):
     """
@@ -28,6 +30,7 @@ def build_url(video_id):
     :return: The YouTube video URL.
     """
     return f"https://www.youtube.com/watch?v={video_id}"
+
 
 def prep_video(src):
     """
@@ -45,8 +48,10 @@ def prep_video(src):
     original_duration = video.duration
 
     # Combine video with black image
-    black_image = (ImageClip("assets/black_image.png"))
-    video = CompositeVideoClip([black_image, video.set_position("center")]).set_duration(video.duration + 30)
+    black_image = ImageClip("assets/black_image.png")
+    video = CompositeVideoClip(
+        [black_image, video.set_position("center")]
+    ).set_duration(video.duration + 30)
 
     # Write video to temporary file
     if not VERBOSE:
@@ -61,6 +66,7 @@ def prep_video(src):
     src = os.path.abspath(src)
 
     return original_duration, src
+
 
 def upload_video(src, hash_id, original_file_name):
     """
@@ -79,7 +85,7 @@ def upload_video(src, hash_id, original_file_name):
 
         # Set options
         options = Options()
-        
+
         if HEADLESS:
             options.add_argument("--headless")
 
@@ -121,7 +127,7 @@ def upload_video(src, hash_id, original_file_name):
         time.sleep(0.5)
         description_el.clear()
         description_el.send_keys(hash_id)
-        
+
         time.sleep(0.5)
 
         # Set `made for kids` option
@@ -151,7 +157,7 @@ def upload_video(src, hash_id, original_file_name):
         print(colored("\t=> Clicking next again...", "yellow"))
         next_button = driver.find_element(By.ID, NEXT_BUTTON_ID)
         next_button.click()
-        
+
         # Wait for 2 seconds
         time.sleep(2)
 
@@ -161,14 +167,12 @@ def upload_video(src, hash_id, original_file_name):
         next_button = driver.find_element(By.ID, NEXT_BUTTON_ID)
         next_button.click()
 
-
         # Set as unlisted
         if VERBOSE:
             print(colored("\t=> Setting as unlisted...", "yellow"))
         RADIO_BUTTON_XPATH = '//*[@id="radioLabel"]'
         radio_button = driver.find_elements(By.XPATH, RADIO_BUTTON_XPATH)
         radio_button[1].click()
-
 
         if VERBOSE:
             print(colored("\t=> Clicking done button...", "yellow"))
@@ -184,7 +188,9 @@ def upload_video(src, hash_id, original_file_name):
         if VERBOSE:
             print(colored("\t=> Getting video URL...", "yellow"))
 
-        driver.get("https://studio.youtube.com/channel/UC1ghEiTed2YQhLY1YNouzfQ/videos/")
+        driver.get(
+            "https://studio.youtube.com/channel/UC1ghEiTed2YQhLY1YNouzfQ/videos/"
+        )
         time.sleep(2)
         videos = driver.find_elements(By.TAG_NAME, "ytcp-video-row")
         first_video = videos[0]
@@ -205,12 +211,18 @@ def upload_video(src, hash_id, original_file_name):
 
         return url
     except Exception as error:
-        print(colored(f"\n[-] An error occurred while uploading the video to YouTube: {error}", "light_red"))
+        print(
+            colored(
+                f"\n[-] An error occurred while uploading the video to YouTube: {error}",
+                "light_red",
+            )
+        )
+
 
 def checksum(large_file):
     md5_object = hashlib.md5()
     block_size = 128 * md5_object.block_size
-    a_file = open(large_file, 'rb')
+    a_file = open(large_file, "rb")
     chunk = a_file.read(block_size)
     while chunk:
         md5_object.update(chunk)
@@ -223,9 +235,10 @@ def checksum(large_file):
 def read_the_barc(frame):
     barcodes = pyzbar.decode(frame)
     for barcode in barcodes:
-        barcode_info = barcode.data.decode('utf-8')
+        barcode_info = barcode.data.decode("utf-8")
         return True, barcode_info
     return False, 0
+
 
 def download_video(url, output_path):
     """
@@ -237,9 +250,9 @@ def download_video(url, output_path):
     :return: None
     """
     if VERBOSE:
-            print(colored(f"\n[+] Downloading video from YouTube...", "light_cyan"))
+        print(colored(f"\n[+] Downloading video from YouTube...", "light_cyan"))
     print(colored(url, "light_green"))
-    video = YouTube(url)
+    video = YouTube(url, use_oauth=USE_OAUTH, allow_oauth_cache=USE_OAUTH)
     best = video.streams.get_highest_resolution()
 
     # Cut duration
@@ -255,12 +268,14 @@ def download_video(url, output_path):
     clip = VideoFileClip(output_path)
     clip = clip.subclip(0, float(duration))
     if not VERBOSE:
-        clip.write_videofile(output_path, codec="libx264", audio_codec="aac", logger=None)
+        clip.write_videofile(
+            output_path, codec="libx264", audio_codec="aac", logger=None
+        )
     else:
         clip.write_videofile(output_path, codec="libx264", audio_codec="aac")
 
     time.sleep(2)
-    
+
     cap = cv2.VideoCapture(output_path)
     ret, first_frame = cap.read()
     res, retval = read_the_barc(first_frame)
@@ -272,7 +287,7 @@ def download_video(url, output_path):
     file = open(output_path, "wb")
 
     pbar = tqdm(total=meta_data["ChunkCount"])
-    while(cap.isOpened()):
+    while cap.isOpened():
         ret, frame = cap.read()
         if ret:
             res, retval = read_the_barc(frame)
@@ -284,7 +299,9 @@ def download_video(url, output_path):
 
     pbar.close()
     file.close()
-    
+
     # md5_sum = checksum(output_path)
     if VERBOSE:
-        print(colored(f"[+] Downloaded video from YouTube: {video.title}", "light_green"))
+        print(
+            colored(f"[+] Downloaded video from YouTube: {video.title}", "light_green")
+        )

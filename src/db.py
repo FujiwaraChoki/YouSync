@@ -16,24 +16,29 @@ SQLITE_FILE_LOCATION = get_sqlite_file_location()
 MONGODB_DB_NAME = get_mongodb_db_name()
 VERBOSE = get_verbose()
 
+
 def connect_mongodb():
     return MongoClient(get_mongo_uri())[MONGODB_DB_NAME]["files"]
+
 
 def connect_sqlite():
     conn = sqlite3.connect(SQLITE_FILE_LOCATION)
     cursor = conn.cursor()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS files
-                (id text, file_path text, video_path text)""")
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS files
+                (id text, file_path text, video_path text)"""
+    )
     return conn, cursor
+
 
 def init_db():
     """
     Initialize the database.
 
-    :return: None    
+    :return: None
     """
     if VERBOSE:
-            print(colored("\n\n[+] Initializing database...", "light_cyan"))
+        print(colored("\n\n[+] Initializing database...", "light_cyan"))
 
     if DB_PROVIDER == "mongodb":
         files_collection = connect_mongodb()
@@ -49,6 +54,7 @@ def init_db():
     else:
         raise Exception("Invalid database provider.")
 
+
 def upload_file_connection(file_path, video_url, hash_id=None):
     """
     Upload a file connection to the database.
@@ -61,19 +67,25 @@ def upload_file_connection(file_path, video_url, hash_id=None):
     """
     if DB_PROVIDER == "mongodb":
         files_collection = connect_mongodb()
-        files_collection.insert_one({
-            "id": str(uuid.uuid4() if hash_id is None else hash_id),
-            "file_path": file_path,
-            "video_path": video_url,
-            "created_at": datetime.now()
-        })
+        files_collection.insert_one(
+            {
+                "id": str(uuid.uuid4() if hash_id is None else hash_id),
+                "file_path": file_path,
+                "video_path": video_url,
+                "created_at": datetime.now(),
+            }
+        )
     elif DB_PROVIDER == "sqlite":
         conn, cursor = connect_sqlite()
-        cursor.execute("INSERT INTO files VALUES (?, ?, ?)", (str(uuid.uuid4() if hash_id is None else hash_id), file_path, video_url))
+        cursor.execute(
+            "INSERT INTO files VALUES (?, ?, ?)",
+            (str(uuid.uuid4() if hash_id is None else hash_id), file_path, video_url),
+        )
         conn.commit()
         conn.close()
     else:
         raise Exception("Invalid database provider.")
+
 
 def get_file(file_path):
     """
@@ -96,6 +108,8 @@ def get_file(file_path):
         return result[2] if result is not None else None
     else:
         raise Exception("Invalid database provider.")
+
+
 def get_video_for_file(file_path):
     """
     Get the video path for a file path.
@@ -145,6 +159,7 @@ def get_file_for_video(video_path):
     else:
         raise Exception("Invalid database provider.")
 
+
 def get_video_for_file_by_hash(hash_id):
     """
     Get the video path for a file path using the file hash.
@@ -155,7 +170,14 @@ def get_video_for_file_by_hash(hash_id):
     """
     if DB_PROVIDER == "mongodb":
         files_collection = connect_mongodb()
-        return files_collection.find_one({"id": hash_id})["video_path"]
+        file = files_collection.find_one({"id": hash_id})
+        if VERBOSE:
+            if file:
+                print(colored(f"[+] File found => {file}", "light_green"))
+            else:
+                print(colored(f"[!] File not found with ID => {hash_id}", "light_red"))
+                sys.exit(1)
+        return file["video_path"]
     elif DB_PROVIDER == "sqlite":
         conn, cursor = connect_sqlite()
         cursor.execute("SELECT * FROM files WHERE id=?", (hash_id,))
@@ -168,6 +190,7 @@ def get_video_for_file_by_hash(hash_id):
         return result[2] if result is not None else None
     else:
         raise Exception("Invalid database provider.")
+
 
 def remove_file_connection(file_path, video_path=None):
     """
@@ -192,6 +215,7 @@ def remove_file_connection(file_path, video_path=None):
         conn.close()
     else:
         raise Exception("Invalid database provider.")
+
 
 def list_files():
     """
@@ -219,16 +243,36 @@ def list_files():
 
     table = PrettyTable()
 
-    table.field_names = ["📌 Index", "🔑 Hash", "📁 File Path", "🎬 YouTube URL", "📅 Created At"]
+    table.field_names = [
+        "📌 Index",
+        "🔑 Hash",
+        "📁 File Path",
+        "🎬 YouTube URL",
+        "📅 Created At"
+    ]
 
     for file in result:
         index = result.index(file) + 1
         if DB_PROVIDER == "mongodb":
-            table.add_row([index, colored(file["id"], "light_cyan"), colored(file["file_path"], "light_magenta"), \
-                            colored(file["video_path"], "light_yellow"), parse_date(file["created_at"])])
+            table.add_row(
+                [
+                    index,
+                    colored(file["id"], "light_cyan"),
+                    colored(file["file_path"], "light_magenta"),
+                    colored(file["video_path"], "light_yellow"),
+                    parse_date(file["created_at"]),
+                ]
+            )
         elif DB_PROVIDER == "sqlite":
-            table.add_row([index, colored(file[0], "light_cyan"), colored(file[1], "light_magenta"), \
-                            colored(file[2], "light_yellow"), parse_date(file[3])])
+            table.add_row(
+                [
+                    index,
+                    colored(file[0], "light_cyan"),
+                    colored(file[1], "light_magenta"),
+                    colored(file[2], "light_yellow"),
+                    parse_date(file[3]),
+                ]
+            )
         else:
             raise Exception("Invalid database provider.")
     print()
@@ -257,6 +301,7 @@ def remove_all_files():
 
     return True
 
+
 def rename_file(file_path, new_file_path):
     """
     Rename a file in the database.
@@ -268,13 +313,15 @@ def rename_file(file_path, new_file_path):
     """
     if DB_PROVIDER == "mongodb":
         files_collection = connect_mongodb()
-        
+
         # Try to find the file by file path, if null, find by hash
         result = files_collection.find_one({"file_path": file_path})
         if result is None:
             result = files_collection.find_one({"id": file_path})
 
-        files_collection.update_one({"id": result["id"]}, {"$set": {"file_path": new_file_path}})
+        files_collection.update_one(
+            {"id": result["id"]}, {"$set": {"file_path": new_file_path}}
+        )
     elif DB_PROVIDER == "sqlite":
         conn, cursor = connect_sqlite()
 
@@ -288,7 +335,9 @@ def rename_file(file_path, new_file_path):
 
             result = cursor.fetchone()
 
-        cursor.execute("UPDATE files SET file_path=? WHERE id=?", (new_file_path, result[0]))
+        cursor.execute(
+            "UPDATE files SET file_path=? WHERE id=?", (new_file_path, result[0])
+        )
 
         conn.commit()
         conn.close()
@@ -319,7 +368,9 @@ def search_files(query):
             files_collection = connect_mongodb()
             result = files_collection.find_one({"id": file_id})
             if not result:
-                print(colored("[!] No file found with ID: {}".format(file_id), "yellow"))
+                print(
+                    colored("[!] No file found with ID: {}".format(file_id), "yellow")
+                )
                 sys.exit(0)
             else:
                 result = [result]
@@ -343,7 +394,9 @@ def search_files(query):
                 result = list(result)
         elif DB_PROVIDER == "sqlite":
             conn, cursor = connect_sqlite()
-            cursor.execute("SELECT * FROM files WHERE file_path LIKE ?", ("%" + query + "%",))
+            cursor.execute(
+                "SELECT * FROM files WHERE file_path LIKE ?", ("%" + query + "%",)
+            )
             result = cursor.fetchall()
             conn.commit()
             conn.close()
@@ -357,7 +410,14 @@ def search_files(query):
     for file in result:
         index = result.index(file) + 1
         if DB_PROVIDER == "mongodb":
-            table.add_row([index, file["id"], colored(file["file_path"], "light_magenta"), file["video_path"]])
+            table.add_row(
+                [
+                    index,
+                    file["id"],
+                    colored(file["file_path"], "light_magenta"),
+                    file["video_path"],
+                ]
+            )
         elif DB_PROVIDER == "sqlite":
             table.add_row([index, file[0], colored(file[1], "light_magenta"), file[2]])
         else:

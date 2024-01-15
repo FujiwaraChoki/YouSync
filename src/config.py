@@ -1,5 +1,6 @@
 import json
 
+
 def get_mongo_uri():
     """
     Get the Mongo URI.
@@ -7,6 +8,7 @@ def get_mongo_uri():
     :return: The Mongo URI.
     """
     return json.loads(open("config.json", "r").read())["mongodb_uri"]
+
 
 def get_db_provider():
     """
@@ -16,6 +18,7 @@ def get_db_provider():
     """
     return json.loads(open("config.json", "r").read())["db_provider"]
 
+
 def get_sqlite_file_location():
     """
     Get the SQLite file location.
@@ -23,6 +26,7 @@ def get_sqlite_file_location():
     :return: The SQLite file location.
     """
     return json.loads(open("config.json", "r").read())["sqlite_file_location"]
+
 
 def get_mongodb_db_name():
     """
@@ -32,6 +36,7 @@ def get_mongodb_db_name():
     """
     return json.loads(open("config.json", "r").read())["mongodb_db_name"]
 
+
 def get_firefox_profile_location():
     """
     Get the Firefox profile location.
@@ -39,6 +44,7 @@ def get_firefox_profile_location():
     :return: The Firefox profile location.
     """
     return json.loads(open("config.json", "r").read())["firefox_profile_location"]
+
 
 def get_headless():
     """
@@ -48,6 +54,7 @@ def get_headless():
     """
     return json.loads(open("config.json", "r").read())["headless"]
 
+
 def get_verbose():
     """
     Get the verbose option.
@@ -55,3 +62,12 @@ def get_verbose():
     :return: The verbose option.
     """
     return json.loads(open("config.json", "r").read())["verbose"]
+
+
+def get_use_oauth():
+    """
+    Get the use OAuth option.
+
+    :return: The use OAuth option.
+    """
+    return json.loads(open("config.json", "r").read())["use_oauth"]

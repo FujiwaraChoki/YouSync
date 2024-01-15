@@ -85,6 +85,7 @@ Here is an example of a config file:
   "mongodb_db_name": "yousync",
   "mongodb_uri": "",
   "firefox_profile_location": "/home/user/.mozilla/firefox/xxxxxxx.default-release",
+  "channel_id": "", // Get your channel ID by visiting youtube studio and extracting it from the URL
   "headless": false,
   "verbose": false
 }

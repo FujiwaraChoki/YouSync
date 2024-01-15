@@ -8,3 +8,4 @@ tmp/*
 *.db
 .vscode
 __pycache__
+.history

@@ -32,10 +32,10 @@ Next, install the `pip` dependencies from the `requirements.txt` file.
 pip install -r requirements.txt
 ```
 
-Then, create a `config.json` file. See [Config Section](#config) for more information.
+Then, create a `config.json` file from the template (`template.config.json`). See [Config Section](#config) for more information.
 
 ```bash
-touch config.json
+cp template.config.json config.json
 ```
 
 You can now rename `run.sh` to yousync, and add it to your `PATH`.
@@ -80,7 +80,7 @@ Here is an example of a config file:
 
 ```json
 {
-  "db_provider": "mongodb",
+  "db_provider": "mongodb", // `mongodb` or `sqlite`
   "sqlite_file_location": "yousync.db",
   "mongodb_db_name": "yousync",
   "mongodb_uri": "",

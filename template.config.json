@@ -4,6 +4,7 @@
     "mongodb_db_name": "",
     "mongodb_uri": "",
     "firefox_profile_location": "",
+    "channel_id": "",
     "headless": false,
     "verbose": false,
     "use_oauth": true

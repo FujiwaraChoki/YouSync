@@ -61,8 +61,12 @@ def main():
             if i + 1 < argc:
                 path = sys.argv[-1]
 
-                if download_file(path):
-                    print("\033[1;32m\n[+] File download successful:", path, "\033[0m")
+                result = download_file(path)
+
+                if result:
+                    print(
+                        "\033[1;32m\n[+] File download successful:", result, "\033[0m"
+                    )
                 else:
                     print("\033[1;33m\n\nFile download failed:", path, "\033[0m")
 

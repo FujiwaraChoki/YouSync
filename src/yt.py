@@ -19,6 +19,7 @@ FIREFOX_PROFILE_LOCATION = get_firefox_profile_location()
 HEADLESS = get_headless()
 VERBOSE = get_verbose()
 USE_OAUTH = get_use_oauth()
+CHANNEL_ID = get_channel_id()
 
 
 def build_url(video_id):
@@ -52,6 +53,9 @@ def prep_video(src):
     video = CompositeVideoClip(
         [black_image, video.set_position("center")]
     ).set_duration(video.duration + 30)
+    
+    # Wait a bit, for the video to be processed
+    time.sleep(0.5)
 
     # Write video to temporary file
     if not VERBOSE:
@@ -91,7 +95,7 @@ def upload_video(src, hash_id, original_file_name):
 
         # Instantiate Webdriver using Firefox profile
         fp = webdriver.FirefoxProfile(FIREFOX_PROFILE_LOCATION)
-        driver = webdriver.Firefox(firefox_profile=fp, firefox_options=options)
+        driver = webdriver.Firefox(firefox_profile=fp, options=options)
 
         # Navigate to YouTube
         driver.get("https://www.youtube.com/upload")
@@ -189,7 +193,7 @@ def upload_video(src, hash_id, original_file_name):
             print(colored("\t=> Getting video URL...", "yellow"))
 
         driver.get(
-            "https://studio.youtube.com/channel/UC1ghEiTed2YQhLY1YNouzfQ/videos/"
+            f"https://studio.youtube.com/channel/{CHANNEL_ID}/videos/"
         )
         time.sleep(2)
         videos = driver.find_elements(By.TAG_NAME, "ytcp-video-row")
@@ -283,6 +287,24 @@ def download_video(url, output_path):
         print(colored("[-] Can't parse first frame of QR Code.", "light_red"))
         return
     meta_data = json.loads(retval)
+
+    # Recursively create directories
+    if not os.path.exists(os.path.dirname(output_path)):
+        if VERBOSE:
+            print(
+                colored(
+                    f"[+] Creating directories recursively: {os.path.dirname(output_path)}",
+                    "light_cyan",
+                )
+            )
+        os.makedirs(os.path.dirname(output_path))
+        if VERBOSE:
+            print(
+                colored(
+                    f"[+] Created directories recursively successfully: {os.path.dirname(output_path)}",
+                    "light_green",
+                )
+            )
 
     file = open(output_path, "wb")
 

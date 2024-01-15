@@ -44,12 +44,13 @@ def download_file(file_path):
             )
         result = get_video_for_file_by_hash(file_path)
 
+    # Generate temporary file path
     temp_path = generate_temp_file_path() + ".mp4"
 
     # Download YouTube video by url
-    download_video(result, temp_path)
+    file_path = download_video(result, temp_path)
 
-    return True
+    return file_path
 
 
 def remove_file(file_path):

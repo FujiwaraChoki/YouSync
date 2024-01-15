@@ -43,6 +43,8 @@ def prep_video(src):
     """
     if VERBOSE:
         print(colored(f"\n[+] Preparing video for YouTube...", "light_cyan"))
+    else:
+        print()
 
     video = VideoFileClip(src)
 
@@ -53,7 +55,7 @@ def prep_video(src):
     video = CompositeVideoClip(
         [black_image, video.set_position("center")]
     ).set_duration(video.duration + 30)
-    
+
     # Wait a bit, for the video to be processed
     time.sleep(0.5)
 
@@ -192,9 +194,7 @@ def upload_video(src, hash_id, original_file_name):
         if VERBOSE:
             print(colored("\t=> Getting video URL...", "yellow"))
 
-        driver.get(
-            f"https://studio.youtube.com/channel/{CHANNEL_ID}/videos/"
-        )
+        driver.get(f"https://studio.youtube.com/channel/{CHANNEL_ID}/videos/")
         time.sleep(2)
         videos = driver.find_elements(By.TAG_NAME, "ytcp-video-row")
         first_video = videos[0]
@@ -251,12 +251,13 @@ def download_video(url, output_path):
     :param url: The YouTube video URL.
     :param output_path: The output path.
 
-    :return: None
+    :return: Original file path.
     """
     if VERBOSE:
         print(colored(f"\n[+] Downloading video from YouTube...", "light_cyan"))
     print(colored(url, "light_green"))
     video = YouTube(url, use_oauth=USE_OAUTH, allow_oauth_cache=USE_OAUTH)
+    original_file_path = video.title.split("::::")[1]
     best = video.streams.get_highest_resolution()
 
     # Cut duration
@@ -289,7 +290,7 @@ def download_video(url, output_path):
     meta_data = json.loads(retval)
 
     # Recursively create directories
-    if not os.path.exists(os.path.dirname(output_path)):
+    if not os.path.exists(os.path.dirname(original_file_path)):
         if VERBOSE:
             print(
                 colored(
@@ -297,7 +298,7 @@ def download_video(url, output_path):
                     "light_cyan",
                 )
             )
-        os.makedirs(os.path.dirname(output_path))
+        os.makedirs(os.path.dirname(original_file_path))
         if VERBOSE:
             print(
                 colored(
@@ -306,7 +307,7 @@ def download_video(url, output_path):
                 )
             )
 
-    file = open(output_path, "wb")
+    file = open(original_file_path, "wb")
 
     pbar = tqdm(total=meta_data["ChunkCount"])
     while cap.isOpened():
@@ -327,3 +328,5 @@ def download_video(url, output_path):
         print(
             colored(f"[+] Downloaded video from YouTube: {video.title}", "light_green")
         )
+
+    return original_file_path
